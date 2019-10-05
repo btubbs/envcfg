@@ -40,6 +40,7 @@ func TestDefaultLoader(t *testing.T) {
 		EmailAddresses []*mail.Address    `env:"EMAIL_ADDRESSES"`
 		Template       *template.Template `env:"GREETING_TEMPLATE"`
 		IP             net.IP             `env:"IP"`
+		Bytes          []byte             `env:"BYTES"`
 	}
 
 	vals := map[string]string{
@@ -65,6 +66,7 @@ func TestDefaultLoader(t *testing.T) {
 		"EMAIL_ADDRESSES":   "Alice <alice@example.com>, Bob <bob@example.com>, Eve <eve@example.com>",
 		"GREETING_TEMPLATE": "Hello {{.Name}}!",
 		"IP":                "8.8.8.8",
+		"BYTES":             "foo bar baz",
 	}
 
 	var conf bigConfig
@@ -103,6 +105,7 @@ func TestDefaultLoader(t *testing.T) {
 		},
 		Template: tmpl,
 		IP:       net.IPv4(8, 8, 8, 8),
+		Bytes:    []byte("foo bar baz"),
 	}
 	assert.Equal(t, expected, conf)
 }
@@ -178,14 +181,14 @@ func TestBuggyParsers(t *testing.T) {
 		},
 		{
 			desc:   "parser that panics",
-			parser: func(s string) (foo, error) { panic("I panicked"); return foo{}, nil },
+			parser: func(s string) (foo, error) { panic("I panicked") },
 			err:    "1 error occurred:\n\n* envcfg: cannot populate B: github.com/btubbs/envcfg.TestBuggyParsers.func2 panicked: I panicked",
 		},
 	}
 
 	for _, tc := range tt {
 		var conf myConfig
-		ec, _ := New()
+		ec := New()
 		ec.RegisterParser(tc.parser)
 		err := ec.LoadFromMap(vals, &conf)
 		assert.Equal(t, tc.err, err.Error(), tc.desc)

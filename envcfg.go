@@ -23,15 +23,12 @@ const (
 var stringType = reflect.TypeOf("")
 
 // New returns a Loader with the default parsers enabled.
-func New() (*Loader, error) {
+func New() *Loader {
 	ec := Empty()
 	for _, f := range DefaultParsers {
-		err := ec.RegisterParser(f)
-		if err != nil {
-			return nil, err
-		}
+		ec.MustRegisterParser(f)
 	}
-	return ec, nil
+	return ec
 }
 
 // Empty returns a Loader without any parsers enabled.
@@ -123,6 +120,13 @@ func (e *Loader) RegisterParser(f interface{}) error {
 	}
 	e.parsers[t.Out(0)] = parser{f: wrapped, numArgs: t.NumIn()}
 	return nil
+}
+
+// MustRegisterParser attempts to register the provided parser func and panics if it gets an error.
+func (e *Loader) MustRegisterParser(f interface{}) {
+	if err := e.RegisterParser(f); err != nil {
+		panic(err)
+	}
 }
 
 // LoadFromMap loads config from the provided map into the provided struct.
