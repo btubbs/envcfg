@@ -187,7 +187,7 @@ func TestBuggyParsers(t *testing.T) {
 		var conf myConfig
 		ec, _ := New()
 		ec.RegisterParser(tc.parser)
-		err := ec.LoadFromMap(vals, &conf)
+		err := ec.LoadFromMap(vals, &conf, true)
 		assert.Equal(t, tc.err, err.Error(), tc.desc)
 	}
 }

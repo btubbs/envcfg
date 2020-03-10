@@ -126,7 +126,7 @@ func (e *Loader) RegisterParser(f interface{}) error {
 }
 
 // LoadFromMap loads config from the provided map into the provided struct.
-func (e *Loader) LoadFromMap(vals map[string]string, c interface{}) error {
+func (e *Loader) LoadFromMap(vals map[string]string, c interface{}, defaultsEnabled bool) error {
 	// assert that c is a struct.
 	pointerType := reflect.TypeOf(c)
 	if pointerType.Kind() != reflect.Ptr {
@@ -159,7 +159,7 @@ func (e *Loader) LoadFromMap(vals map[string]string, c interface{}) error {
 		// loop over split tagval, pulling values from environment, and erroring if any are missing.
 		// pass spread list of env vars into parser
 		defaultString, defaultOK := field.Tag.Lookup(defaultTag)
-		if defaultOK {
+		if defaultOK && defaultsEnabled {
 			envDefaults = splitDefaultTag(defaultString)
 			if len(envKeys) != len(envDefaults) {
 				return fmt.Errorf("envcfg: env tag %s has %d names but default tag %s has %d values",
@@ -227,9 +227,15 @@ func (e *Loader) LoadFromMap(vals map[string]string, c interface{}) error {
 }
 
 // Load loads config from the environment into the provided struct.
-func (e *Loader) Load(c interface{}) error {
-	return e.LoadFromMap(envListToMap(os.Environ()), c)
+func (e *Loader) LoadWithDefaults(c interface{}) error {
+	return e.LoadFromMap(envListToMap(os.Environ()), c, true)
 }
+
+// Load loads config from the environment into the provided struct.
+func (e *Loader) LoadWithoutDefaults(c interface{}) error {
+	return e.LoadFromMap(envListToMap(os.Environ()), c, false)
+}
+
 
 func envListToMap(ss []string) map[string]string {
 	out := map[string]string{}
