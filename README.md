@@ -1,3 +1,7 @@
+# THIS REPO HAS MOVED
+
+See the new home at https://github.com/nav-inc/envcfg
+
 # envcfg [![Build Status](https://travis-ci.com/nav-inc/envcfg.svg?branch=master)](https://travis-ci.com/nav-inc/envcfg) 
 
 envcfg is a Go package for loading config from environment variables into struct fields of arbitrary
